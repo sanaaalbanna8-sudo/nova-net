@@ -110,6 +110,25 @@ export function apply(state, action, caseCount) {
       ledger.push({ kind: 'vote', studentId: id, name: people[id], caseId, choice: action.choice, ms, at: Date.now() })
       return touch({ ...state, people, ledger, votes: { ...(state.votes || {}), [id]: action.choice } })
     }
+    case 'jump': {
+      const index = action.index
+      if (!Number.isInteger(index) || index < 0 || index >= caseCount) return state
+      if (state.phase === 'voting') return state
+      if (index === state.caseIndex && state.briefing == null) return state
+      const history = { ...(state.history || {}) }
+      if (state.briefing == null) history[state.caseIndex] = snapshot(state)
+      const saved = history[index]
+      return touch({
+        ...state,
+        history,
+        briefing: null,
+        caseIndex: index,
+        phase: saved?.phase || 'discuss',
+        votes: saved?.votes ? { ...saved.votes } : {},
+        voteEndsAt: saved?.phase === 'voting' ? saved.voteEndsAt : null,
+        discussStartedAt: Date.now(),
+      })
+    }
     case 'next':
     case 'prev': {
       if (typeof state.briefing === 'number') return state

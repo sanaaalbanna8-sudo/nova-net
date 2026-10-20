@@ -73,9 +73,14 @@ export default function HostRoom({ identity, onLeave }) {
                     {SLIDES[state.briefing + 1].title}
                   </button>
                 ) : (
-                  <button className="btn-gold" onClick={() => send({ type: 'cases-start' })}>
-                    ابدئي الحالات
-                  </button>
+                  <>
+                    <button className="btn-gold" onClick={() => send({ type: 'cases-start' })}>
+                      ابدئي الحالات
+                    </button>
+                    <button className="btn-sea" onClick={() => send({ type: 'jump', index: 15 })}>
+                      أسئلة أعمق
+                    </button>
+                  </>
                 )}
               </>
             ) : (
@@ -100,6 +105,13 @@ export default function HostRoom({ identity, onLeave }) {
                 </button>
                 <button className="btn-ghost" disabled={state.caseIndex >= cases.length - 1} onClick={() => send({ type: 'next' })}>
                   التالي
+                </button>
+                <button
+                  className="btn-ghost"
+                  disabled={state.phase === 'voting'}
+                  onClick={() => send({ type: 'jump', index: state.caseIndex >= 15 ? 0 : 15 })}
+                >
+                  {state.caseIndex >= 15 ? 'الحالات الأولى' : 'أسئلة أعمق'}
                 </button>
                 <span className="text-xs font-bold text-mist">{PHASE_LABEL[state.phase]}</span>
               </>
