@@ -28,11 +28,19 @@ export default function ResultsBoard({ item, phase, votes, endsAt, answer = null
         </p>
       </div>
       {answer?.best && (
-        <p className="vote-answer">
-          الأصح: {answer.best}
-          {bestTitle ? `. ${bestTitle}` : ''}
-          {answer.why ? ` — ${answer.why}` : ''}
-        </p>
+        <div className="answer-card">
+          <p className="answer-card-kicker">الإجابة الصحيحة</p>
+          <p className="answer-card-best">
+            {answer.best}
+            {bestTitle ? `. ${bestTitle}` : ''}
+          </p>
+          {answer.why ? (
+            <>
+              <p className="answer-card-kicker">السبب</p>
+              <p className="answer-card-why">{answer.why}</p>
+            </>
+          ) : null}
+        </div>
       )}
       <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[140px_minmax(0,1fr)] lg:items-center">
         <div

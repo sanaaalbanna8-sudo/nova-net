@@ -55,7 +55,7 @@ export default function StudentRoom({ identity, onLeave }) {
           <div className="board-dock">
             <span className="text-sm font-extrabold text-ink">{identity.name}</span>
             <span className="text-xs font-bold text-mist">
-              {opening ? 'تابعي الشريحة مع المعلمة' : state.phase === 'voting' ? 'اختاري النوع الأنسب' : state.phase === 'results' ? 'النتائج قدامك' : 'النقاش مفتوح'}
+              {opening ? 'تابعي الشريحة مع المعلمة' : state.phase === 'voting' ? 'اختاري النوع الأنسب' : state.phase === 'results' ? 'شوفي الإجابة الصحيحة والسبب' : 'النقاش مفتوح'}
             </span>
             {state.myVote && state.phase === 'voting' && <span className="chip border-sea/30 bg-sea/10 text-sea">صوتك {state.myVote}</span>}
           </div>
