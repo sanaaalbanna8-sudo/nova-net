@@ -1,3 +1,4 @@
+import cases from '../data/cases.json'
 import { VOTE_SECONDS } from '../config'
 
 export function createState() {
@@ -29,23 +30,36 @@ function snapshot(state) {
 }
 
 export function summarize(votes) {
-  const counts = { A: 0, B: 0, C: 0 }
-  for (const choice of Object.values(votes || {})) {
-    if (counts[choice] !== undefined) counts[choice] += 1
+  const counts = { A: 0, B: 0, C: 0, D: 0, E: 0 }
+  const values = Object.values(votes || {}).map((choice) => String(choice || '')).filter(Boolean)
+  const total = values.length
+  const multi = values.some((choice) => choice.length > 1)
+  for (const choice of values) {
+    const keys = multi ? choice.split('') : [choice]
+    for (const key of keys) if (counts[key] !== undefined) counts[key] += 1
   }
-  const total = counts.A + counts.B + counts.C
-  const percents = { A: 0, B: 0, C: 0 }
+  const percents = { A: 0, B: 0, C: 0, D: 0, E: 0 }
   if (total) {
-    ;['A', 'B', 'C'].forEach((key) => {
-      percents[key] = Math.round((counts[key] / total) * 100)
-    })
-    const drift = 100 - (percents.A + percents.B + percents.C)
-    if (drift) {
-      const top = ['A', 'B', 'C'].sort((a, b) => counts[b] - counts[a])[0]
-      percents[top] += drift
+    for (const key of Object.keys(percents)) percents[key] = Math.round((counts[key] / total) * 100)
+    if (!multi) {
+      const drift = 100 - (percents.A + percents.B + percents.C)
+      if (drift) {
+        const top = ['A', 'B', 'C'].sort((a, b) => counts[b] - counts[a])[0]
+        percents[top] += drift
+      }
     }
   }
   return { counts, total, percents }
+}
+
+function acceptedChoice(caseIndex, choice) {
+  const item = cases[caseIndex]
+  if (!item) return ''
+  const allowed = item.options.map((option) => option.key)
+  const picked = [...new Set(String(choice || '').toUpperCase().split('').filter((key) => allowed.includes(key)))].sort()
+  const need = item.pick || 1
+  if (picked.length !== need) return ''
+  return picked.join('')
 }
 
 export function apply(state, action, caseCount) {
@@ -88,7 +102,8 @@ export function apply(state, action, caseCount) {
     }
     case 'open': {
       if (state.phase === 'voting' || typeof state.briefing === 'number') return state
-      return touch({ ...state, phase: 'voting', voteEndsAt: Date.now() + VOTE_SECONDS * 1000 })
+      const seconds = cases[state.caseIndex]?.seconds || VOTE_SECONDS
+      return touch({ ...state, phase: 'voting', voteEndsAt: Date.now() + seconds * 1000 })
     }
     case 'close': {
       if (state.phase !== 'voting') return state
@@ -98,17 +113,26 @@ export function apply(state, action, caseCount) {
       if (state.phase !== 'voting') return state
       const id = String(action.studentId || '')
       const name = String(action.name || '').trim().slice(0, 40)
-      if (!id || !['A', 'B', 'C'].includes(action.choice)) return state
+      if (!id) return state
+      const picked = acceptedChoice(state.caseIndex, action.choice)
       const people = { ...(state.people || {}) }
       if (!people[id] && name.length >= 2) people[id] = name
       if (!people[id]) return state
-      if (state.votes?.[id] === action.choice && state.people?.[id] === people[id]) return state
+      if (!picked) {
+        if (!state.votes?.[id]) return state
+        const votes = { ...(state.votes || {}) }
+        delete votes[id]
+        const ledger = (state.ledger || []).filter((item) => !(item.kind === 'vote' && item.studentId === id && item.caseId === state.caseIndex + 1))
+        return touch({ ...state, people, votes, ledger })
+      }
+      if (state.votes?.[id] === picked && state.people?.[id] === people[id]) return state
       const caseId = state.caseIndex + 1
-      const started = (state.voteEndsAt || Date.now()) - VOTE_SECONDS * 1000
+      const seconds = cases[state.caseIndex]?.seconds || VOTE_SECONDS
+      const started = (state.voteEndsAt || Date.now()) - seconds * 1000
       const ms = Math.max(0, Date.now() - started)
       const ledger = (state.ledger || []).filter((item) => !(item.kind === 'vote' && item.studentId === id && item.caseId === caseId))
-      ledger.push({ kind: 'vote', studentId: id, name: people[id], caseId, choice: action.choice, ms, at: Date.now() })
-      return touch({ ...state, people, ledger, votes: { ...(state.votes || {}), [id]: action.choice } })
+      ledger.push({ kind: 'vote', studentId: id, name: people[id], caseId, choice: picked, ms, at: Date.now() })
+      return touch({ ...state, people, ledger, votes: { ...(state.votes || {}), [id]: picked } })
     }
     case 'jump': {
       const index = action.index

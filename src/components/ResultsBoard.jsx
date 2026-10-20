@@ -6,7 +6,13 @@ export default function ResultsBoard({ item, phase, votes, endsAt, answer = null
   const live = summary || summarize(votes || {})
   const { counts, total, percents } = live
   const clock = useCountdown(phase === 'voting' ? endsAt : null)
-  const bestTitle = answer?.best ? item.options.find((option) => option.key === answer.best)?.title : ''
+  const picking = (item.pick || 1) > 1
+  const correctKeys = answer?.best ? String(answer.best).split('') : []
+  const bestTitle = picking
+    ? item.options.filter((option) => correctKeys.includes(option.key)).map((option) => option.title).join(' · ')
+    : answer?.best
+      ? item.options.find((option) => option.key === answer.best)?.title
+      : ''
 
   return (
     <section className="case-choices">
@@ -30,10 +36,7 @@ export default function ResultsBoard({ item, phase, votes, endsAt, answer = null
       {answer?.best && (
         <div className="answer-card">
           <p className="answer-card-kicker">الإجابة الصحيحة</p>
-          <p className="answer-card-best">
-            {answer.best}
-            {bestTitle ? `. ${bestTitle}` : ''}
-          </p>
+          <p className="answer-card-best">{picking ? bestTitle : `${answer.best}${bestTitle ? `. ${bestTitle}` : ''}`}</p>
           {answer.why ? (
             <>
               <p className="answer-card-kicker">السبب</p>
@@ -42,8 +45,8 @@ export default function ResultsBoard({ item, phase, votes, endsAt, answer = null
           ) : null}
         </div>
       )}
-      <div className="grid min-h-0 flex-1 gap-4 lg:grid-cols-[140px_minmax(0,1fr)] lg:items-center">
-        <div
+      <div className={`grid min-h-0 flex-1 gap-4 ${picking ? '' : 'lg:grid-cols-[140px_minmax(0,1fr)] lg:items-center'}`}>
+        {!picking && <div
           className="mx-auto grid h-32 w-32 place-items-center rounded-full"
           style={{
             background: total
@@ -55,14 +58,14 @@ export default function ResultsBoard({ item, phase, votes, endsAt, answer = null
             <span className="text-xs text-faint">الأصوات</span>
             <span className="text-2xl font-extrabold text-ink">{total}</span>
           </div>
-        </div>
+        </div>}
         <div className="space-y-3">
           {item.options.map((option) => (
             <div key={option.key}>
               <div className="mb-1 flex items-center justify-between gap-3 text-sm">
                 <span className={`font-bold ${CHOICE_STYLE[option.key].text}`}>
                   {option.key}. {option.title}
-                  {answer?.best === option.key ? ' · الأصح' : ''}
+                  {correctKeys.includes(option.key) ? ' · الأصح' : ''}
                 </span>
                 <span className="font-extrabold text-ink">
                   {counts[option.key]} · {percents[option.key]}٪

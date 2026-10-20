@@ -1434,6 +1434,31 @@ input:focus-visible {
   gap: 8px;
 }
 
+.choice-grid.is-pick {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.choice-card.is-picked {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(14, 124, 132, 0.18);
+}
+
+.pick-slots {
+  display: flex;
+  gap: 8px;
+}
+
+.pick-slots i {
+  width: 42px;
+  height: 10px;
+  border-radius: 999px;
+  background: #e4ebf3;
+}
+
+.pick-slots i.is-on {
+  background: #0e7c84;
+}
+
 .choice-card {
   position: relative;
   display: flex;

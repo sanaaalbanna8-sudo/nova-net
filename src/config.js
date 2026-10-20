@@ -12,6 +12,8 @@ export const CHOICE_STYLE = {
   A: { bar: '#c9a227', text: 'text-gold2', ring: 'border-gold bg-[#fff8ea]' },
   B: { bar: '#0e7c84', text: 'text-sea', ring: 'border-sea bg-[#eefafa]' },
   C: { bar: '#e15a4a', text: 'text-coral', ring: 'border-coral bg-[#fff1ee]' },
+  D: { bar: '#1c2433', text: 'text-ink', ring: 'border-ink bg-[#f4f7fb]' },
+  E: { bar: '#8a6420', text: 'text-gold2', ring: 'border-gold bg-[#fff8ea]' },
 }
 
 export const PHASE_LABEL = {

@@ -7,17 +7,20 @@ export function sheetPayload(state) {
   for (const item of state?.ledger || []) {
     if (item.kind !== 'vote') continue
     const itemCase = cases.find((entry) => entry.id === item.caseId)
-    const option = itemCase?.options.find((entry) => entry.key === item.choice)
+    const letters = String(item.choice || '').split('')
+    const optionTitle = letters.map((letter) => itemCase?.options.find((entry) => entry.key === letter)?.title || letter).join(' + ')
     const key = ANSWER_KEY[item.caseId]
+    const best = key?.best ? String(key.best).split('').sort().join('') : ''
+    const got = letters.slice().sort().join('')
     records.push([
       `${item.studentId}-${item.caseId}`,
       item.name || '',
       item.caseId,
       itemCase?.title || '',
       item.choice,
-      option?.title || '',
+      optionTitle,
       Math.round(Number(item.ms || 0) / 100) / 10,
-      key && key.best === item.choice ? 1 : 0,
+      best && best === got ? 1 : 0,
       item.at || Date.now(),
     ])
   }

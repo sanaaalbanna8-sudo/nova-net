@@ -78,7 +78,7 @@ export default function HostRoom({ identity, onLeave }) {
                       ابدئي الحالات
                     </button>
                     <button className="btn-sea" onClick={() => send({ type: 'jump', index: 15 })}>
-                      أسئلة أعمق
+                      اختيار ٣ من ٥
                     </button>
                   </>
                 )}
@@ -94,7 +94,7 @@ export default function HostRoom({ identity, onLeave }) {
                     send({ type: 'open' })
                   }}
                 >
-                  فتح التصويت · {VOTE_SECONDS} ث
+                  فتح التصويت · {item.seconds || VOTE_SECONDS} ث
                 </button>
                 <button className="btn-sea" disabled={state.phase !== 'voting'} onClick={() => send({ type: 'close' })}>
                   إغلاق وعرض النتائج
@@ -111,7 +111,7 @@ export default function HostRoom({ identity, onLeave }) {
                   disabled={state.phase === 'voting'}
                   onClick={() => send({ type: 'jump', index: state.caseIndex >= 15 ? 0 : 15 })}
                 >
-                  {state.caseIndex >= 15 ? 'الحالات الأولى' : 'أسئلة أعمق'}
+                  {state.caseIndex >= 15 ? 'الحالات الأولى' : 'اختيار ٣ من ٥'}
                 </button>
                 <span className="text-xs font-bold text-mist">{PHASE_LABEL[state.phase]}</span>
               </>
