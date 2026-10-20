@@ -1,5 +1,5 @@
-export const BRAND_AR = 'نوفا ترافل'
-export const BRAND_EN = 'Nova Travel'
+export const BRAND_AR = 'أكاديمية ساندز'
+export const BRAND_EN = 'Sands Academy'
 export const MEETING_AR = 'الاجتماع الطارئ'
 export const MEETING_EN = 'Which network?'
 export const UNIT_LINE = 'الصف 12 · الوحدة 11 · نتاج التعلم ب · الأمن السيبراني'
