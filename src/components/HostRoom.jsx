@@ -41,9 +41,9 @@ export default function HostRoom({ identity, onLeave }) {
 
   return (
     <Shell status={status} onLeave={() => onLeave('')} leaveLabel="إغلاق اللوحة" stage clock={elapsed} progress={progress}>
-      <div className={`board ${opening ? 'is-opening' : ''}`}>
-        {!opening && <Roster people={state.people} online={online} votes={state.votes} />}
-        <div className="board-main" style={opening ? { gridColumn: '1 / -1' } : undefined}>
+      <div className="board">
+        <Roster people={state.people} online={online} votes={state.votes} />
+        <div className="board-main">
           {opening ? (
             <Briefing step={state.briefing} />
           ) : (
